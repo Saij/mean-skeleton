@@ -18,6 +18,9 @@ async.series([
     	app.loadModules(next);
     },
     function (next) {
+    	app.setupWebserver(next);
+    },
+    function (next) {
         app.start(next);
     }
 ], function (err) {

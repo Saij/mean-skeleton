@@ -55,14 +55,6 @@ app.setupLogger = function (name) {
     return winston.loggers.get(name);
 }
 
-app.isProd = function () {
-    return app.env === 'production';
-}
-
-app.isDev = function () {
-    return app.env === 'development';
-}
-
 app.setup = function (cb) {
 	app.env = process.env.STAGE ? process.env.STAGE : 'production';
 
@@ -90,10 +82,49 @@ app.loadModules = function (cb) {
 	async.series(moduleLoader, cb);
 }
 
+app.setupWebserver = function (cb) {
+    var express         = require('express');
+    var bodyParser      = require('body-parser');
+    var methodOverride  = require('method-override');
+    var cookieParser    = require('cookie-parser');
+    var session         = require('express-session');
+
+    app.webserver = express();
+    app.httpServer = require('http').Server(app.webserver);
+    app.webserver.set('trust proxy', 1);
+
+    app.webserver.use(bodyParser.urlencoded({
+        extended: false
+    }));
+    app.webserver.use(bodyParser.json());
+    app.webserver.use(methodOverride());
+    app.webserver.use(cookieParser(app.config.cookieParser.secret));
+    app.webserver.use(session(app.config.session));
+
+    app.webserver.use(function (req, res, next) {
+        res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('Access-Control-Allow-Origin', req.headers.origin);
+        res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,HEAD,DELETE,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type,X-Requested-With');
+
+        if (req.method == 'OPTIONS') {
+            res.send(200);
+        }
+        else {
+            next();
+        }
+    });
+
+    require('./routes.js');
+
+    cb();
+}
+
 app.start = function (cb) {
-	app._loadModule('webserver', function () {
-		app.webserver.start(cb);
-	});
+    app.httpServer.listen(app.config.port, function () {
+        app.log.info('Webserver listening on ' + app.config.port);
+        cb();
+    });
 }
 
 module.exports = exports = app;
