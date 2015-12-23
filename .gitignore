@@ -4,7 +4,7 @@
 
 node_modules
 npm_debug.log
-bower_modules
+bower_component
 
 ####################
 ### IDE ############
