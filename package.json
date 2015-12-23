@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "repository": "https://github.com/Saij/mean-skeleton",
-  "description": "",
+  "description": "A simple MEAN Skeleton",
   "main": "server.js",
   "scripts": {
     "postinstall": "bower install"

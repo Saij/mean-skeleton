@@ -148,4 +148,9 @@ app.start = function (cb) {
     });
 }
 
+app.getModel = function (model) {
+    require(app.rootDir + '/models/' + model + '.js');
+    return require('mongoose').model(model);
+}
+
 module.exports = exports = app;
