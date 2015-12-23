@@ -12,13 +12,16 @@ app.rootDir = __dirname;
  */
 async.series([
     function (next) {
-        app.setup(next);
+        app.setupApplication(next);
     },
     function (next) {
-    	app.loadModules(next);
+        app.setupDatabase(next);
     },
     function (next) {
-    	app.setupWebserver(next);
+        app.setupWebserver(next);
+    },
+    function (next) {
+        app.loadModules(next);
     },
     function (next) {
         app.start(next);

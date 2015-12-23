@@ -1,6 +1,7 @@
-var winston = require('winston');
-var merge 	= require('merge');
-var async 	= require('async');
+var winston      = require('winston');
+var merge 	     = require('merge');
+var async 	     = require('async');
+var mongoose     = require('mongoose');
 
 var app = {
 	name: 'mean-skeleton',
@@ -55,7 +56,7 @@ app.setupLogger = function (name) {
     return winston.loggers.get(name);
 }
 
-app.setup = function (cb) {
+app.setupApplication = function (cb) {
 	app.env = process.env.STAGE ? process.env.STAGE : 'production';
 
     app.log = app.setupLogger(app.name);
@@ -98,8 +99,8 @@ app.setupWebserver = function (cb) {
     }));
     app.webserver.use(bodyParser.json());
     app.webserver.use(methodOverride());
-    app.webserver.use(cookieParser(app.config.cookieParser.secret));
-    app.webserver.use(session(app.config.session));
+    app.webserver.use(cookieParser(app.config.webserver.cookieParser.secret));
+    app.webserver.use(session(app.config.webserver.session));
 
     app.webserver.use(function (req, res, next) {
         res.header('Access-Control-Allow-Credentials', 'true');
@@ -120,9 +121,29 @@ app.setupWebserver = function (cb) {
     cb();
 }
 
+app.setupDatabase = function (cb) {
+    if (!app.config.database.useDatabase) {
+        return cb();
+    }
+
+    var authString = '';
+    if (app.config.database.username) {
+        authString = app.config.database.username + ':' + app.config.database.password + '@';
+    }
+
+    var connectionString = 'mongodb://' + authString + app.config.database.host + ':' + app.config.database.port + '/' + app.config.database.database;
+
+    mongoose.connect(connectionString, function (err) {
+        if (!err) {
+            app.log.info('Connected to database');
+        }
+        cb(err);
+    });
+}
+
 app.start = function (cb) {
-    app.httpServer.listen(app.config.port, function () {
-        app.log.info('Webserver listening on ' + app.config.port);
+    app.httpServer.listen(app.config.webserver.port, function () {
+        app.log.info('Webserver listening on ' + app.config.webserver.port);
         cb();
     });
 }
