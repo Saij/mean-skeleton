@@ -1,0 +1,11 @@
+{
+	"production": {
+		"modules": [
+
+		]
+	},
+
+	"development": {
+		"_extends": "production"
+	}
+}

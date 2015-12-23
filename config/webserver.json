@@ -1,0 +1,20 @@
+{
+    "production": {
+        "port": 8000,
+        "cookieParser": {
+            "secret": "44iog45h54h455445jf0j430f409j"
+        },
+        "session": {
+            "name": "deploy",
+            "secret": "44iog45h54h455445jf0j430f409j",
+            "resave": false,
+            "saveUninitialized": true,
+            "cookie": {
+                "secure": false
+            }
+        }
+    },
+    "development": {
+        "_extends": "production"
+    }
+}
