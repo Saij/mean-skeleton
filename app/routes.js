@@ -1,7 +1,7 @@
 var application = require('./application.js');
 var serveStatic = require('serve-static');
 
-application.webserver.use('/', serveStatic(application.rootDir + '/public', {
+application.webserver.use('/', serveStatic(application.rootDir + '/public/', {
     maxAge: 1000 * 60 * 60 * 24 * 30, // 5 months,
     lastModified: true,
     etag: true,
