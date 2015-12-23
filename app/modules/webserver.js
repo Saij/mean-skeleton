@@ -39,6 +39,8 @@ var webserver = {
             }
         });
 
+        require('../routes.js');
+
         cb();
     },
 
