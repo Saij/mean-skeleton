@@ -1,0 +1,10 @@
+{
+    "production": {
+        "host": "127.0.0.1",
+        "port": 27017,
+        "database": "mean-skeleton"
+    },
+    "development": {
+        "_extends": "production"
+    }
+}

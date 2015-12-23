@@ -1,5 +1,6 @@
 var winston = require('winston');
 var merge 	= require('merge');
+var async 	= require('async');
 
 var app = {
 	name: 'mean-skeleton',
@@ -34,12 +35,12 @@ app.loadConfig = function (file, section) {
     return config;
 }
 
-app._loadModule = function (module) {
+app._loadModule = function (module, cb) {
     app.log.info('Loading module ' + module);
     var obj = require(app.rootDir + '/app/modules/' + module + '.js');
     var logger = app.setupLogger(module);
     app[module] = obj
-    app[module].setup(logger);
+    app[module].setup(logger, cb);
 }
 
 app.setupLogger = function (name) {
@@ -72,16 +73,27 @@ app.setup = function (cb) {
 }
 
 app.loadModules = function (cb) {
-	cb();
+	var moduleLoader = [];
+	for (var i = 0; i < app.config.modules.length; i++) {
+		var module = app.config.modules[i];
+		
+		// Load webserver as last module
+		if (module === 'webserver') {
+			continue;
+		}
+
+		moduleLoader.push(function (next) {
+			app._loadModule(module, next);
+		});
+	}
+
+	async.series(moduleLoader, cb);
 }
 
 app.start = function (cb) {
-
-	if (!app.webserver) {
-		app._loadModule('webserver');
-	}
-
-	app.webserver.start(cb);
+	app._loadModule('webserver', function () {
+		app.webserver.start(cb);
+	});
 }
 
 module.exports = exports = app;

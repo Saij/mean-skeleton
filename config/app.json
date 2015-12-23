@@ -1,7 +1,7 @@
 {
 	"production": {
 		"modules": [
-
+			"database"
 		]
 	},
 

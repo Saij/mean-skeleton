@@ -3,7 +3,7 @@ var application = require('../application.js');
 var webserver = {
     log: null,
 
-    setup: function (logger) {
+    setup: function (logger, cb) {
         webserver.log    = logger;
         webserver.config = application.loadConfig('webserver', application.env);
 
@@ -38,6 +38,8 @@ var webserver = {
                 next();
             }
         });
+
+        cb();
     },
 
     start: function (cb) {
